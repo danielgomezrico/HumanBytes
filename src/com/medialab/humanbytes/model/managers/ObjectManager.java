@@ -1,6 +1,7 @@
 package com.medialab.humanbytes.model.managers;
 
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.Vector;
 
 import android.app.Activity;
@@ -20,6 +21,7 @@ public class ObjectManager {
 	// ****************************************************************
 	
 	private final static int DELAY_THREAD_UPDATE = 50;
+	private final static int DELAY_THREAD_NEW_FALLING_OBJECT = 1700;
 	
 	// ****************************************************************
 	// Attributes
@@ -27,16 +29,24 @@ public class ObjectManager {
 	
 	private Vector<FallingObject> fallingObjects;
 	private Player player;
-	private int score = 0;
+	private int score;
+	private int lifes;
 	
-	private static ObjectManager instance;
+	private boolean threadsCanRun = true;
+
 	
 	// ****************************************************************
 	// Constructor
 	// ****************************************************************
 	
-	private ObjectManager() {
+	public ObjectManager() {
+		
 		fallingObjects = new Vector<FallingObject>();
+		
+		score = 0;
+		lifes = 2;
+		
+		
 	}
 	
 	// ****************************************************************
@@ -53,19 +63,26 @@ public class ObjectManager {
 				
 				int width = DisplayManager.getInstance().getWidth();
 				
-				Bitmap image = BitmapFactory.decodeResource(activity.getResources(), R.drawable.tuercabuena);
-				int imageWidth = image.getWidth();
+				Bitmap imageGood = BitmapFactory.decodeResource(activity.getResources(), R.drawable.tuercabuena);
+				Bitmap imageBad = BitmapFactory.decodeResource(activity.getResources(), R.drawable.tuercamala);
+				int imageWidth = imageGood.getWidth();
+				Random random = new Random();
 				
-				while (true) {
+				while (threadsCanRun) {
 					
 					// Set the limits, left limit right limit
 					float x = imageWidth / 2 + (float) (Math.random() * (width - imageWidth));
 					
-					addFallingObject(new FallingObject(x, 0, image));
+					if (random.nextInt(4) == 1) {
+						addFallingObject(new FallingObject(x, 0, imageBad, false));
+					}
+					else {
+						addFallingObject(new FallingObject(x, 0, imageGood, true));
+					}
 					
 					try {
 						// Poner este tiempo como variable
-						Thread.sleep(800);
+						Thread.sleep(DELAY_THREAD_NEW_FALLING_OBJECT);
 					}
 					catch (InterruptedException e) {
 						// TODO Auto-generated catch block
@@ -84,12 +101,11 @@ public class ObjectManager {
 			@Override
 			public void run() {
 				
-				boolean move = true;
 				int height = DisplayManager.getInstance().getHeight();
 				
 				ArrayList<FallingObject> objectsToRemove = new ArrayList<FallingObject>();
 				
-				while (move) {
+				while (threadsCanRun) {
 					
 					synchronized (fallingObjects) {
 						
@@ -106,7 +122,17 @@ public class ObjectManager {
 							else if (Rect.intersects(playerRect, fallingObject.getRectangle())) {
 								// TODO: contar
 								objectsToRemove.add(fallingObject);
-								score++;
+								
+								if (fallingObject.isGood()) {
+									score++;
+								}
+								else {
+									lifes--;
+								}
+								
+								if (lifes == 0) {
+									manageDead();
+								}
 							}
 							
 						}
@@ -135,17 +161,6 @@ public class ObjectManager {
 	}
 	
 	// ****************************************************************
-	// Accesor methods
-	// ****************************************************************
-	
-	public static ObjectManager getInstance() {
-		if (instance == null) {
-			instance = new ObjectManager();
-		}
-		return instance;
-	}
-	
-	// ****************************************************************
 	// Player methods
 	// ****************************************************************
 	
@@ -155,6 +170,14 @@ public class ObjectManager {
 	
 	public void movePlayer(float offsetX) {
 		player.moveX(offsetX);
+	}
+	
+	private void manageDead() {
+		
+		threadsCanRun = false;
+		
+		ActivityManager.getInstance().finish();
+		
 	}
 	
 	// ****************************************************************
@@ -174,9 +197,20 @@ public class ObjectManager {
 	}
 	
 	// ****************************************************************
-	// Draw methods
+	// Accesor methods
 	// ****************************************************************
 	
+	public int getScore() {
+		return score;
+	}
+	
+	public int getLifes() {
+		return lifes;
+	}
+	
+	// ****************************************************************
+	// Draw methods
+	// ****************************************************************
 	public void drawObjects(Canvas canvas) {
 		
 		synchronized (fallingObjects) {
@@ -186,7 +220,10 @@ public class ObjectManager {
 			}
 		}
 		
-		player.draw(canvas);
+		if (player != null) {
+			player.draw(canvas);
+		}
+		
 	}
 	
 }

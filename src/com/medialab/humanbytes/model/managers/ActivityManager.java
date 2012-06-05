@@ -28,4 +28,10 @@ public class ActivityManager {
 		return activity;
 	}
 	
+	public void finish() {
+		if (activity != null) {
+			activity.finish();
+		}
+	}
+	
 }

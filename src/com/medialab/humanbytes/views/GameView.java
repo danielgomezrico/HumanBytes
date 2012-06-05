@@ -1,32 +1,40 @@
 package com.medialab.humanbytes.views;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Paint.Style;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 import com.medialab.humanbytes.R;
-import com.medialab.humanbytes.model.accelerometer.AccelerometerManager;
 import com.medialab.humanbytes.model.accelerometer.IAccelerometerObserver;
 import com.medialab.humanbytes.model.gameObjects.Player;
+import com.medialab.humanbytes.model.managers.ActivityManager;
 import com.medialab.humanbytes.model.managers.DisplayManager;
 import com.medialab.humanbytes.model.managers.ObjectManager;
 
 public class GameView extends SurfaceView implements SurfaceHolder.Callback, IAccelerometerObserver {
 	
 	// ****************************************************************
+	// Constants
+	// ****************************************************************
+	
+	private final int TEXT_SIZE = 20;
+	
+	// ****************************************************************
 	// Attributes
 	// ****************************************************************
 	
-	
 	private SurfaceUpdateThread updateThread;
 	private int backgroundColor;
+	private Paint paintText;
 	
 	private ObjectManager objManager;
-	
-	private AccelerometerManager accManager;
 	
 	// ****************************************************************
 	// Constructor
@@ -35,17 +43,19 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, IAc
 	public GameView(Context context) {
 		super(context);
 		getHolder().addCallback(this);
-		updateThread = new SurfaceUpdateThread(this);
-		
-		backgroundColor = getResources().getColor(android.R.color.background_dark);
-		
+		setKeepScreenOn(true);
 		setFocusable(true);
 		
-		accManager = new AccelerometerManager(context);
-		accManager.subscribe(this);
-		accManager.startListen();
+		paintText = new Paint();
+		paintText.setColor(Color.BLUE);
+		paintText.setStyle(Style.FILL);
+		paintText.setTextSize(TEXT_SIZE);
 		
 		initWorld();
+		
+		backgroundColor = getResources().getColor(android.R.color.background_dark);
+		updateThread = new SurfaceUpdateThread(this);
+
 	}
 	
 	// ****************************************************************
@@ -54,15 +64,15 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, IAc
 	
 	public void initWorld() {
 		
+		objManager = new ObjectManager();
+
+		Activity activity = ActivityManager.getInstance().getActivity();
 		int width = DisplayManager.getInstance().getWidth();
 		int height = DisplayManager.getInstance().getHeight();
 		
-		objManager = ObjectManager.getInstance();
-
 		// Init the player
-		Bitmap playerImage = BitmapFactory.decodeResource(getResources(), R.drawable.robot);
-		Player player = new Player(playerImage, width / 2, height - playerImage.getHeight() / 2,
-				width);
+		Bitmap playerImage = BitmapFactory.decodeResource(activity.getResources(), R.drawable.robot);
+		Player player = new Player(playerImage, width / 2, height - playerImage.getHeight() / 2, width);
 		objManager.createPlayer(player);
 		
 		// Init the rest of the world
@@ -70,7 +80,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, IAc
 		objManager.initThreadUpdateObjects();
 		
 	}
-	
 	
 	// ****************************************************************
 	// Accelerometer methods
@@ -89,7 +98,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, IAc
 	public void onDraw(Canvas canvas) {
 		canvas.drawColor(backgroundColor);
 		
-		objManager.drawObjects(canvas);
+		if (objManager != null) {
+			objManager.drawObjects(canvas);
+			
+			canvas.drawText(String.format("Score: %d", objManager.getScore()), 0, TEXT_SIZE, paintText);
+			canvas.drawText(String.format("Lifes: %d", objManager.getLifes()), 0, TEXT_SIZE * 2, paintText);
+		}
 		
 	}
 	

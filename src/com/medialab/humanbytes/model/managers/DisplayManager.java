@@ -16,9 +16,14 @@ public class DisplayManager {
 		
 		Activity activity = ActivityManager.getInstance().getActivity();
 		
-		Display display = ((WindowManager) activity.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
-		DISPLAY_WIDTH = display.getWidth();
-		DISPLAY_HEIGHT = display.getHeight();
+		if (activity != null) {
+			Display display = ((WindowManager) activity.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+			DISPLAY_WIDTH = display.getWidth();
+			DISPLAY_HEIGHT = display.getHeight();
+		}else{
+			DISPLAY_WIDTH = 0;
+			DISPLAY_HEIGHT = 0;
+		}
 		
 	}
 	

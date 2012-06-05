@@ -1,5 +1,7 @@
 package com.medialab.humanbytes.model.gameObjects;
 
+import java.util.Random;
+
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Rect;
@@ -18,11 +20,13 @@ public class FallingObject {
 	private float posX;
 	private float posY;
 	
+	private boolean good;
+	
 	// ****************************************************************
 	// Constructor
 	// ****************************************************************
 	
-	public FallingObject(float posX, float posY, Bitmap image) {
+	public FallingObject(float posX, float posY, Bitmap image, boolean good) {
 		this.posX = posX;
 		this.posY = posY;
 		
@@ -33,7 +37,13 @@ public class FallingObject {
 		imageMiddleHeight = imageHeight / 2;
 		
 		// TODO: Hacerla randomica
-		moveDistance = 2;
+		Random random = new Random();
+		moveDistance = random.nextInt(5);
+		if(moveDistance < 2){
+			moveDistance = 2;
+		} 
+		
+		this.good = good;
 	}
 	
 	// ****************************************************************
@@ -59,6 +69,10 @@ public class FallingObject {
 	
 	public float getHeight() {
 		return imageHeight;
+	}
+	
+	public boolean isGood(){
+		return good;
 	}
 	
 	// ****************************************************************
