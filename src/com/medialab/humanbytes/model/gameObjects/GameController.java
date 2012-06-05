@@ -23,6 +23,7 @@ public class GameController {
 	
 	private final static int DELAY_THREAD_UPDATE = 50;
 	private final static int DELAY_THREAD_NEW_FALLING_OBJECT = 1700;
+	private final static int DELAY_THREAD_NEW_FALLING_OBJECT_MIN = 500;
 	
 	// ****************************************************************
 	// Attributes
@@ -66,6 +67,7 @@ public class GameController {
 				Bitmap imageBad = BitmapFactory.decodeResource(activity.getResources(), R.drawable.tuercamala);
 				int imageWidth = imageGood.getWidth();
 				Random random = new Random();
+				int delayTemp = DELAY_THREAD_NEW_FALLING_OBJECT;
 				
 				while (threadsCanRun) {
 					
@@ -81,7 +83,11 @@ public class GameController {
 					
 					try {
 						// Poner este tiempo como variable
-						Thread.sleep(DELAY_THREAD_NEW_FALLING_OBJECT - score*20 );
+						if (delayTemp > DELAY_THREAD_NEW_FALLING_OBJECT_MIN) {
+							delayTemp = DELAY_THREAD_NEW_FALLING_OBJECT - score * 20;
+						}
+						
+						Thread.sleep(delayTemp);
 					}
 					catch (InterruptedException e) {
 						// TODO Auto-generated catch block
