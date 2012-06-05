@@ -1,4 +1,4 @@
-package com.medialab.humanbytes.model.managers;
+package com.medialab.humanbytes.model.gameObjects;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -11,10 +11,11 @@ import android.graphics.Canvas;
 import android.graphics.Rect;
 
 import com.medialab.humanbytes.R;
-import com.medialab.humanbytes.model.gameObjects.FallingObject;
-import com.medialab.humanbytes.model.gameObjects.Player;
+import com.medialab.humanbytes.model.managers.ActivityManager;
+import com.medialab.humanbytes.model.managers.DisplayManager;
+import com.medialab.humanbytes.model.managers.VibrationHelper;
 
-public class ObjectManager {
+public class GameController {
 	
 	// ****************************************************************
 	// Attributes
@@ -33,19 +34,17 @@ public class ObjectManager {
 	private int lifes;
 	
 	private boolean threadsCanRun = true;
-
 	
 	// ****************************************************************
 	// Constructor
 	// ****************************************************************
 	
-	public ObjectManager() {
+	public GameController() {
 		
 		fallingObjects = new Vector<FallingObject>();
 		
 		score = 0;
 		lifes = 2;
-		
 		
 	}
 	
@@ -82,7 +81,7 @@ public class ObjectManager {
 					
 					try {
 						// Poner este tiempo como variable
-						Thread.sleep(DELAY_THREAD_NEW_FALLING_OBJECT);
+						Thread.sleep(DELAY_THREAD_NEW_FALLING_OBJECT - score*20 );
 					}
 					catch (InterruptedException e) {
 						// TODO Auto-generated catch block
@@ -124,10 +123,16 @@ public class ObjectManager {
 								objectsToRemove.add(fallingObject);
 								
 								if (fallingObject.isGood()) {
+									
 									score++;
+									
 								}
 								else {
+									
 									lifes--;
+									
+									VibrationHelper.vibrate(300);
+									
 								}
 								
 								if (lifes == 0) {

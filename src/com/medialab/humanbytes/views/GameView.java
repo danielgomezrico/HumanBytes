@@ -13,10 +13,10 @@ import android.view.SurfaceView;
 
 import com.medialab.humanbytes.R;
 import com.medialab.humanbytes.model.accelerometer.IAccelerometerObserver;
+import com.medialab.humanbytes.model.gameObjects.GameController;
 import com.medialab.humanbytes.model.gameObjects.Player;
 import com.medialab.humanbytes.model.managers.ActivityManager;
 import com.medialab.humanbytes.model.managers.DisplayManager;
-import com.medialab.humanbytes.model.managers.ObjectManager;
 
 public class GameView extends SurfaceView implements SurfaceHolder.Callback, IAccelerometerObserver {
 	
@@ -34,7 +34,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, IAc
 	private int backgroundColor;
 	private Paint paintText;
 	
-	private ObjectManager objManager;
+	private GameController objManager;
 	
 	// ****************************************************************
 	// Constructor
@@ -64,7 +64,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, IAc
 	
 	public void initWorld() {
 		
-		objManager = new ObjectManager();
+		objManager = new GameController();
 
 		Activity activity = ActivityManager.getInstance().getActivity();
 		int width = DisplayManager.getInstance().getWidth();

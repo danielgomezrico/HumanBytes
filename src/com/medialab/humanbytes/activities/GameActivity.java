@@ -38,6 +38,7 @@ public class GameActivity extends Activity {
 		
 		Toast.makeText(ActivityManager.getInstance().getActivity(), String.format("ÁPerdiste!"), Toast.LENGTH_SHORT)
 				.show();
+		
 		accManager.stopListen();
 		super.onDestroy();
 		
