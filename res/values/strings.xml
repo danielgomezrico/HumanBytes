@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="hello">Hello World, GameActivity!</string>
-    <string name="app_name">HumanBytes</string>
+    <string name="app_name">Eat-It</string>
+    <string name="game_lose">You lose!!!</string>
+    <string name="game_plus_one">Score +1!</string>
+    <string name="game_minus_one">Life -1!</string>
 
 </resources>
